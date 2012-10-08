@@ -192,6 +192,7 @@ public class LogglyAppender extends AppenderSkeleton {
             }
 
             synchronized (stopLock) {
+                curState = ThreadState.STOPPED;
                 stopLock.notify();
             }
         }
