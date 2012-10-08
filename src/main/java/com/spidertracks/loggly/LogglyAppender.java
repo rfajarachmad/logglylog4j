@@ -2,6 +2,7 @@ package com.spidertracks.loggly;
 
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.AppenderSkeleton;
@@ -90,7 +91,11 @@ public class LogglyAppender extends AppenderSkeleton {
         }
 
         LogLog.debug("Creating database in " + dirName + " with name " + getName());
-        db = new EmbeddedDb(dirName, getName(), errorHandler);
+        try {
+            db = new EmbeddedDb(dirName, getName(), errorHandler);
+        } catch (SQLException e) {
+            errorHandler.error("Failed to initialize database. Message: " + e.getMessage());
+        }
         
         poster = new HttpPost();
         

@@ -9,7 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.ErrorHandler;
-import org.hsqldb.Server;
+import org.hsqldb.server.Server;
+import org.hsqldb.server.HsqlServerFactory;
 import org.hsqldb.server.ServerConstants;
 
 /**
@@ -42,21 +43,15 @@ public class EmbeddedDb {
      * @param dirName
      * @param logName
      * @param errorHandler
+     * @throws SQLException 
      */
-    public EmbeddedDb(String dirName, String logName, ErrorHandler errorHandler) {
+    public EmbeddedDb(String dirName, String logName, ErrorHandler errorHandler) throws SQLException {
 
         databasePath = "file:" + dirName + "/" + logName + ";hsqldb.applog=1; hsqldb.lock_file=false";
         hsqlConfigUrl = "jdbc:hsqldb:" + databasePath;
-        
-        server = startServer();
-        
         this.errorHandler = errorHandler;
-        try {
-            createTableAndIndex(dirName, logName);
-        } catch (SQLException e) {
-            errorHandler.error("Unable to create local database for log queue",
-                    e, 1);
-        }
+        server = startServer();
+        createTableAndIndex(dirName, logName);
     }
 
     /**
@@ -154,16 +149,10 @@ public class EmbeddedDb {
         return conn != null;
     }
 
-    private Server startServer() {
+    private Server startServer() throws SQLException {
         synchronized (serverLock) {
-            Server server = new Server();
-            
-            server.setDatabaseName(0, "loggly");
-            server.setDatabasePath(0, databasePath);
-            server.setLogWriter(null);
-            server.setErrWriter(null);
+            Server server = (Server) HsqlServerFactory.createHsqlServer(databasePath, false, true);
             server.start();
-            
             return server;            
         }
     }
