@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.spidertracks</groupId>
   <artifactId>loggly</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>Loggly asynchronous http logger</name>
   <description>Logs log4j message asynchronously to loggly via the http input.</description>
     <distributionManagement>
