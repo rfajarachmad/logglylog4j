@@ -6,6 +6,15 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Loggly asynchronous http logger</name>
   <description>Logs log4j message asynchronously to loggly via the http input.</description>
+    <distributionManagement>
+        <repository>
+            <id>amplafi.public</id>
+            <url>ftp://maven.amplafi.com/</url>
+        </repository>
+    </distributionManagement>
+<properties>
+<wagon-build>2.2</wagon-build>
+</properties>
 
   <build>
     <plugins>
@@ -31,6 +40,18 @@
 
       </plugin>
     </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>${wagon-build}</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>${wagon-build}</version>
+            </extension>
+        </extensions>
   </build>
   <dependencies>
     <dependency>
