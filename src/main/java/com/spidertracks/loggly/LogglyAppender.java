@@ -6,7 +6,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Layout;
+import org.apache.log4j.WriterAppender;
 import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -34,6 +37,8 @@ public class LogglyAppender extends AppenderSkeleton {
     private int proxyPort = -1;
 
     private Object waitLock = new Object();
+
+    static final String TAB = "    ";
 
     public LogglyAppender() {
         super();
@@ -67,6 +72,25 @@ public class LogglyAppender extends AppenderSkeleton {
         assert this.layout != null : "Cannot log, there is no layout configured.";
 
         String output = this.layout.format(event);
+
+        if (this.layout.ignoresThrowable()) {
+            String[] s = event.getThrowableStrRep();
+            if (s != null) {
+                StringBuilder sb = new StringBuilder(output);
+                for(int i = 0; i < s.length; i++) {
+                    if (s[i].startsWith("\t")) {
+                        sb.append(TAB);
+                        sb.append(s[i].substring(1));
+                        sb.append(Layout.LINE_SEP);
+                    } else {
+                        sb.append(s[i]);
+                        sb.append(Layout.LINE_SEP);
+                    }
+
+                }
+                output = sb.toString();
+            }
+        }
 
         synchronized (waitLock) {
             db.writeEntry(output, System.nanoTime());
